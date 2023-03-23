@@ -10,7 +10,7 @@ StackAPI::StackAPI(const APIConfig& conf, bool dryRun) : conf(conf), dryRun(dryR
     }
 }
 
-nlohmann::json StackAPI::post(const std::string& dest,
+nlohmann::json StackAPI::postRaw(const std::string& dest,
                     const std::map<std::string, std::string>& postBodyExtras,
                     const APIConfigOpt& opt) {
     if (dryRun) {
@@ -86,12 +86,14 @@ nlohmann::json StackAPI::getRaw(const std::string &dest,
         if (opt.autoHandleBackoff.value_or(conf.autoHandleBackoff)) {
             checkBackoff();
         }
-        cpr::Payload body = {
+        cpr::Parameters body = {
             {"key", conf.apiKey},
-            {"site", opt.site.value_or(conf.site)}
+            {"site", opt.site.value_or(conf.site)},
+            {"pagesize", std::to_string(opt.pageSize.value_or(conf.pageSize))},
+            {"page", std::to_string(opt.page.value_or(1))}
         };
 
-        for (auto& [k, v] : postBodyExtras) {
+        for (auto& [k, v] : extraParams) {
             body.Add({k, v});
         }
 
@@ -111,7 +113,8 @@ nlohmann::json StackAPI::getRaw(const std::string &dest,
                 throw std::runtime_error("Connection failed or internet dead (probably the latter): " + res.text + "; " + res.error.message);
             }
         } break;
-        case 500: {
+        case 500:
+        case 503: {
             if (opt.autoHandleDowntime.value_or(conf.autoHandleDowntime)) {
                 spdlog::warn("Stack is down. Sleeping 5 minutes...");
                 std::this_thread::sleep_for(std::chrono::minutes(5));
@@ -165,6 +168,10 @@ void StackAPI::registerBackoff(const nlohmann::json &res) {
         conf.backoff.secs = res.at("backoff").get<int>();
         conf.backoff.timeReceived = std::chrono::system_clock::now();
     }
+    if (res.contains("quota_remaining")) {
+        res.at("quota_remaining").get_to(conf.remainingQuota);
+    }
+
 }
 
 }

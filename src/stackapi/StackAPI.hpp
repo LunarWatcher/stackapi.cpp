@@ -6,6 +6,7 @@
 
 #include "data/Backoff.hpp"
 #include "nlohmann/json_fwd.hpp"
+#include "stackapi/data/structs/APIResponse.hpp"
 #include <cpr/cpr.h>
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
@@ -40,10 +41,8 @@ struct APIConfigOpt {
 };
 
 class StackAPI {
-private:
-    APIConfig conf;
-
 public:
+    APIConfig conf;
     /**
      * Utility control variable.
      *
@@ -54,7 +53,7 @@ public:
 
     StackAPI(const APIConfig& conf, bool dryRun = false);
 
-    nlohmann::json post(const std::string& dest,
+    nlohmann::json postRaw(const std::string& dest,
                         const std::map<std::string, std::string>& postBodyExtras = {},
                         const APIConfigOpt& opt = {});
 
@@ -66,7 +65,8 @@ public:
     std::vector<T> get(const std::string& dest,
                         const std::map<std::string, std::string>& extraParams = {},
                         const APIConfigOpt& opt = {}) {
-
+        auto raw = getRaw(dest, extraParams, opt);
+        return raw.get<APIResponse<T>>();
     }
 
     /**
@@ -77,6 +77,8 @@ public:
     /**
      * Registers the backoff from a given JSON response.
      * This automatically checks if the backoff key is present
+     *
+     * Also, the name is partly a lie. It also st ores the remaining quota in conf. 
      */
     void registerBackoff(const nlohmann::json& res);
 
