@@ -8,6 +8,7 @@
 #include "nlohmann/json_fwd.hpp"
 #include <cpr/cpr.h>
 #include <nlohmann/json.hpp>
+#include <spdlog/spdlog.h>
 
 namespace stackapi {
 
@@ -55,60 +56,17 @@ public:
 
     nlohmann::json post(const std::string& dest,
                         const std::map<std::string, std::string>& postBodyExtras = {},
+                        const APIConfigOpt& opt = {});
+
+    nlohmann::json getRaw(const std::string& dest,
+                        const std::map<std::string, std::string>& extraParams = {},
+                        const APIConfigOpt& opt = {});
+
+    template <typename T>
+    std::vector<T> get(const std::string& dest,
+                        const std::map<std::string, std::string>& extraParams = {},
                         const APIConfigOpt& opt = {}) {
-        if (dryRun) {
-            return {};
-        }
-        size_t count = 0;
-        do {
-            if (opt.autoHandleBackoff.value_or(conf.autoHandleBackoff)) {
-                checkBackoff();
-            }
-            cpr::Payload body = {
-                {"key", conf.apiKey},
-                {"site", opt.site.value_or(conf.site)}
-            };
 
-            if (opt.auth || conf.auth.size()) {
-                body.Add({"access_token", opt.auth.value_or(conf.auth)});
-            }
-
-            cpr::Url url{"https://api.stackexchange.com/" + conf.apiVersion + "/" + dest};
-            auto res = cpr::Post(url, body);
-
-            switch (res.status_code) {
-            case 0: {
-
-            } break;
-            case 500: {
-                if (opt.autoHandleDowntime.value_or(conf.autoHandleDowntime)) {
-
-                } else {
-                    throw std::runtime_error("Stack's servers are down: " + res.text + "; " + res.error.message);
-                }
-            } break;
-            case 200: {
-                auto json = nlohmann::json::parse(res.text);
-                return json;
-            } break;
-            default:
-                break;
-            }
-            if (res.status_code == 0) {
-            } else if (res.status_code != 200) {
-                try {
-                    auto json = nlohmann::json::parse(res.text);
-                } catch (...) {
-                    
-                }
-            } else {
-                auto json = nlohmann::json::parse(res.text);
-                if (json.contains("backoff")) {
-                    conf.backoff.secs = json["backoff"].get<int>();
-
-                }
-            }
-        } while (true);
     }
 
     void checkBackoff();
