@@ -10,6 +10,7 @@ namespace stackapi {
 struct APIConfig {
     std::string apiKey = "";
     std::string auth = "";
+    std::string site = "";
 
     std::string apiVersion = "2.3";
     unsigned int pageSize = 100;
@@ -26,11 +27,21 @@ private:
     APIConfig conf;
 
 public:
+    bool dryRun = false;
 
-    StackAPI(const APIConfig& conf);
+    StackAPI(const APIConfig& conf, bool dryRun = false);
+
+    template <typename T>
+    std::vector<T> post(const std::string& dest, const std::string& filter = "") {
+        if (dryRun) {
+            return {};
+        }
+
+        
+
+    }
 
     Backoff getBackoff() { return conf.backoff; }
-
     int getRemainingQuota() { return conf.remainingQuota; }
 };
 
