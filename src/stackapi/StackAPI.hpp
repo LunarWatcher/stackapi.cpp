@@ -89,7 +89,7 @@ public:
             } break;
             case 200: {
                 auto json = nlohmann::json::parse(res.text);
-
+                return json;
             } break;
             default:
                 break;
