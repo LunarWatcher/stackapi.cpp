@@ -1,8 +1,9 @@
+#include <chrono>
 namespace stackapi {
 
 struct Backoff {
     int secs;
-    double timeReceived;
+    std::chrono::system_clock::time_point timeReceived;
 };
 
 }

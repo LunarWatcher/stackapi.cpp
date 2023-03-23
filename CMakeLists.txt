@@ -19,6 +19,7 @@ include(${CMAKE_BINARY_DIR}/conan.cmake)
 conan_cmake_configure (REQUIRES 
                         cpr/1.10.1
                         nlohmann_json/3.11.2
+                        fmt/9.1.0 
                         GENERATORS cmake)
 conan_cmake_autodetect (settings)
 conan_cmake_install (PATH_OR_REFERENCE . BUILD missing SETTINGS ${settings})
