@@ -69,7 +69,15 @@ public:
 
     }
 
+    /**
+     * Checks for a backoff, and sleeps if necessary.
+     */
     void checkBackoff();
+
+    /**
+     * Registers the backoff from a given JSON response.
+     * This automatically checks if the backoff key is present
+     */
     void registerBackoff(const nlohmann::json& res);
 
     Backoff getBackoff() { return conf.backoff; }
