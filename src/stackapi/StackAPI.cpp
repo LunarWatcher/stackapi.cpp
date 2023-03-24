@@ -77,9 +77,6 @@ APIResponse StackAPI::post(const std::string& dest,
 APIResponse StackAPI::get(const std::string &dest,
                                 const std::map<std::string, std::string>& extraParams,
                                 const APIConfigOpt& opt) {
-    if (dryRun) {
-        return {};
-    }
 
     do {
 

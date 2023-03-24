@@ -58,7 +58,8 @@ public:
      * Utility control variable.
      *
      * This is never set to anything but false by the library. Its primary intended use is to allow for non-request
-     * testing in applications.
+     * testing in applications. Note that this exclusively applies to POST requests, and not GET requests, as GET
+     * requests don't change anything and therefore generally don't need to be limited.
      */
     bool dryRun = false;
 
