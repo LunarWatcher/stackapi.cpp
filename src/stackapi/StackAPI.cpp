@@ -50,7 +50,7 @@ nlohmann::json StackAPI::postRaw(const std::string& dest,
             }
         }
 
-        switch (res.status_code) {
+        switch (status_code) {
         case 0: {
             if (opt.autoHandleDowntime.value_or(conf.autoHandleDowntime)) {
                 spdlog::warn("Host disconnected from the internet. Sleeping 5 minutes...");
@@ -118,7 +118,17 @@ nlohmann::json StackAPI::getRaw(const std::string &dest,
         cpr::Url url{"https://api.stackexchange.com/" + conf.apiVersion + "/" + dest};
         auto res = cpr::Get(url, body);
 
-        switch (res.status_code) {
+        auto status_code = res.status_code;
+        if (status_code == 400) { 
+            try {
+                status_code = nlohmann::json::parse(res.text).at("error_id");
+            } catch (...) {
+                // "json" is HTML
+                status_code = 500;
+            }
+        }
+
+        switch (status_code) {
         case 0: {
             if (opt.autoHandleDowntime.value_or(conf.autoHandleDowntime)) {
                 spdlog::warn("Host disconnected from the internet. Sleeping 5 minutes...");
