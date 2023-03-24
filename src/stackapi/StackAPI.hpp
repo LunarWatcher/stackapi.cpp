@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "data/Backoff.hpp"
-#include "nlohmann/json_fwd.hpp"
 #include "stackapi/data/structs/APIResponse.hpp"
 #include <cpr/cpr.h>
 #include <nlohmann/json.hpp>
