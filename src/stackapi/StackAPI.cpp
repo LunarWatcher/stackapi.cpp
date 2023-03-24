@@ -40,6 +40,11 @@ nlohmann::json StackAPI::postRaw(const std::string& dest,
         cpr::Url url{"https://api.stackexchange.com/" + conf.apiVersion + "/" + dest};
         auto res = cpr::Post(url, body);
 
+        auto status_code = res.status_code;
+        if (status_code == 400) {
+            status_code = nlohmann::json::parse(res).at("error_id");
+        }
+
         switch (res.status_code) {
         case 0: {
             if (opt.autoHandleDowntime.value_or(conf.autoHandleDowntime)) {
