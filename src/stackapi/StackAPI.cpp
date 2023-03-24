@@ -41,8 +41,13 @@ nlohmann::json StackAPI::postRaw(const std::string& dest,
         auto res = cpr::Post(url, body);
 
         auto status_code = res.status_code;
-        if (status_code == 400) {
-            status_code = nlohmann::json::parse(res).at("error_id");
+        if (status_code == 400) { 
+            try {
+                status_code = nlohmann::json::parse(res).at("error_id");
+            } catch (...) {
+                // "json" is HTML
+                status_code = 500;
+            }
         }
 
         switch (res.status_code) {
