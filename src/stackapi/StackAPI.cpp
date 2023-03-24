@@ -10,7 +10,7 @@ StackAPI::StackAPI(const APIConfig& conf, bool dryRun) : conf(conf), dryRun(dryR
     }
 }
 
-nlohmann::json StackAPI::postRaw(const std::string& dest,
+APIResponse StackAPI::post(const std::string& dest,
                     const std::map<std::string, std::string>& postBodyExtras,
                     const APIConfigOpt& opt) {
     if (dryRun) {
@@ -65,7 +65,7 @@ nlohmann::json StackAPI::postRaw(const std::string& dest,
         case 200: {
             auto json = nlohmann::json::parse(res.text);
             registerBackoff(json);
-            return json;
+            return json.get<APIResponse>();
         } break;
         default:
             throw std::runtime_error("Unhandled status code: " + std::to_string(res.status_code) + ": " + res.text + " ; " + res.error.message);
@@ -74,7 +74,7 @@ nlohmann::json StackAPI::postRaw(const std::string& dest,
     } while (true);
 }
 
-nlohmann::json StackAPI::getRaw(const std::string &dest,
+APIResponse StackAPI::get(const std::string &dest,
                                 const std::map<std::string, std::string>& extraParams,
                                 const APIConfigOpt& opt) {
     if (dryRun) {
@@ -133,7 +133,7 @@ nlohmann::json StackAPI::getRaw(const std::string &dest,
         case 200: {
             auto json = nlohmann::json::parse(res.text);
             registerBackoff(json);
-            return json;
+            return json.get<APIResponse>();
         } break;
         default:
             throw std::runtime_error("Unhandled status code: " + std::to_string(res.status_code));

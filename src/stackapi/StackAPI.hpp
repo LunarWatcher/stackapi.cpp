@@ -25,6 +25,17 @@ struct APIConfig {
     bool autoHandleBackoff = true;
     bool autoHandleDowntime = true;
 
+    /**
+     * Backoff calculations have two seconds added for good measure.
+     * Those two seconds are multiplied by this value.
+     *
+     * If it's 0, there is no addition to the expected backoff time. This is
+     * not recommended, as this is much more likely to lead to throttle
+     * violations. This value can be increased for multi-process applications
+     * where thread safety (not currently implemented anyway) isn't enough.
+     */
+    int backoffStrictnessMultiplier = 1;
+
     Backoff backoff = { 0, std::chrono::system_clock::now() };
 };
 
@@ -53,21 +64,13 @@ public:
 
     StackAPI(const APIConfig& conf, bool dryRun = false);
 
-    nlohmann::json postRaw(const std::string& dest,
+    APIResponse post(const std::string& dest,
                         const std::map<std::string, std::string>& postBodyExtras = {},
                         const APIConfigOpt& opt = {});
 
-    nlohmann::json getRaw(const std::string& dest,
+    APIResponse get(const std::string& dest,
                         const std::map<std::string, std::string>& extraParams = {},
                         const APIConfigOpt& opt = {});
-
-    template <typename T>
-    std::vector<T> get(const std::string& dest,
-                        const std::map<std::string, std::string>& extraParams = {},
-                        const APIConfigOpt& opt = {}) {
-        auto raw = getRaw(dest, extraParams, opt);
-        return raw.get<APIResponse<T>>();
-    }
 
     /**
      * Checks for a backoff, and sleeps if necessary.
