@@ -11,12 +11,14 @@ endif()
 
 set (CMAKE_CXX_STANDARD 20)
 
+set(SPDLOG_FMT_EXTERNAL ON CACHE STRING "" FORCE)
+set(CURL_ZLIB "AUTO" CACHE STRING "" FORCE)
+
 include(FetchContent)
 FetchContent_Declare(fmt GIT_REPOSITORY https://github.com/fmtlib/fmt.git
     GIT_TAG 9.1.0)
 FetchContent_MakeAvailable(fmt)
 
-set(SPDLOG_FMT_EXTERNAL ON)
 include(FetchContent)
 FetchContent_Declare(cpr GIT_REPOSITORY https://github.com/libcpr/cpr.git
     GIT_TAG 1.10.0)
