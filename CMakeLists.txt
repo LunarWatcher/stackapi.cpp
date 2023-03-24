@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 3.10)
 project(stackapi.cpp)
 
+if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    message (STATUS "stackapi.cpp: Running standalone")
+    set (ENABLE_DEMOS ON)
+else()
+    message (STATUS "stackapi.cpp: Running as a submodule; disabling demos.")
+    set (ENABLE_DEMOS OFF)
+endif()
+
 set (CMAKE_CXX_STANDARD 20)
 
 include(FetchContent)
@@ -24,10 +32,9 @@ FetchContent_MakeAvailable(spdlog)
 
 
 add_subdirectory(src)
-#add_subdirectory(tests)
 
-#add_custom_target(test
-    #COMMAND tests
-    #DEPENDS tests
-    #COMMENT "Test stackapi.cpp")
+if (ENABLE_DEMOS)
+    add_subdirectory(demo)
+endif()
+
 # vim:ft=cmake

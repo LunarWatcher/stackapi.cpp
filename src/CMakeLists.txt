@@ -1,4 +1,4 @@
-add_library(stackapi
+add_library(stackapi STATIC
     stackapi/StackAPI.cpp
 
     stackapi/data/json/Deserialisers.cpp

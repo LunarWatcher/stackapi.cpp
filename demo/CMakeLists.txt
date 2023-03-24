@@ -1,0 +1,4 @@
+add_compile_definitions("API_KEY=\"k60dxEVfvM5wJ2foUbE7eQ((\"")
+
+add_executable(get-comments src/GetComments.cpp)
+target_link_libraries(get-comments stackapi)
