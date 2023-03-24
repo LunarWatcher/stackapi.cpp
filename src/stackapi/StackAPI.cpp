@@ -99,7 +99,7 @@ nlohmann::json StackAPI::getRaw(const std::string &dest,
         }
 
         cpr::Url url{"https://api.stackexchange.com/" + conf.apiVersion + "/" + dest};
-        auto res = cpr::Post(url, body);
+        auto res = cpr::Get(url, body);
 
         switch (res.status_code) {
         case 0: {
