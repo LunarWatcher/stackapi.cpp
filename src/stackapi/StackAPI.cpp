@@ -20,6 +20,7 @@ nlohmann::json StackAPI::postRaw(const std::string& dest,
         if (opt.autoHandleBackoff.value_or(conf.autoHandleBackoff)) {
             checkBackoff();
         }
+
         cpr::Payload body = {
             {"key", conf.apiKey},
             {"site", opt.site.value_or(conf.site)}
@@ -178,7 +179,7 @@ void StackAPI::checkBackoff() {
             ).count()
         );
 
-        auto wait = backoff.secs - consumed + 2;
+        auto wait = backoff.secs - consumed + 2 * conf.backoffStrictnessMultiplier;
         if (wait > 0) {
             std::this_thread::sleep_for(std::chrono::seconds(wait));
         }
