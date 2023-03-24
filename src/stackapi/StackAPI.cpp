@@ -25,6 +25,10 @@ nlohmann::json StackAPI::postRaw(const std::string& dest,
             {"site", opt.site.value_or(conf.site)}
         };
 
+        if (opt.filter) {
+            body.Add({"filter", *opt.filter});
+        }
+
         for (auto& [k, v] : postBodyExtras) {
             body.Add({k, v});
         }
@@ -89,6 +93,9 @@ nlohmann::json StackAPI::getRaw(const std::string &dest,
             {"pagesize", std::to_string(opt.pageSize.value_or(conf.pageSize))},
             {"page", std::to_string(opt.page.value_or(1))}
         };
+        if (opt.filter) {
+            body.Add({"filter", *opt.filter});
+        }
 
         for (auto& [k, v] : extraParams) {
             body.Add({k, v});
