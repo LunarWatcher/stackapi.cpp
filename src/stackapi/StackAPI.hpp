@@ -69,7 +69,7 @@ public:
                         const APIConfigOpt& opt = {});
 
     template <typename T>
-    std::vector<T> post(const std::string& dest,
+    APIResponse<T> post(const std::string& dest,
                         const std::map<std::string, std::string>& postBodyExtras = {},
                         const APIConfigOpt& opt = {}) {
         auto raw = postRaw(dest, postBodyExtras, opt);
@@ -81,7 +81,7 @@ public:
                         const APIConfigOpt& opt = {});
 
     template <typename T>
-    std::vector<T> get(const std::string& dest,
+    APIResponse<T> get(const std::string& dest,
                         const std::map<std::string, std::string>& extraParams = {},
                         const APIConfigOpt& opt = {}) {
         auto raw = getRaw(dest, extraParams, opt);
