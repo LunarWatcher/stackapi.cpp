@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "data/Backoff.hpp"
+#include "nlohmann/json_fwd.hpp"
 #include "stackapi/data/structs/APIResponse.hpp"
 #include <cpr/cpr.h>
 #include <nlohmann/json.hpp>
@@ -57,20 +58,35 @@ public:
      * Utility control variable.
      *
      * This is never set to anything but false by the library. Its primary intended use is to allow for non-request
-     * testing in applications. Note that this exclusively applies to POST requests, and not GET requests, as GET
-     * requests don't change anything and therefore generally don't need to be limited.
+     * testing in applications.
      */
     bool dryRun = false;
 
     StackAPI(const APIConfig& conf, bool dryRun = false);
 
-    APIResponse post(const std::string& dest,
+    nlohmann::json postRaw(const std::string& dest,
                         const std::map<std::string, std::string>& postBodyExtras = {},
                         const APIConfigOpt& opt = {});
 
-    APIResponse get(const std::string& dest,
+    template <typename T>
+    std::vector<T> post(const std::string& dest,
+                        const std::map<std::string, std::string>& postBodyExtras = {},
+                        const APIConfigOpt& opt = {}) {
+        auto raw = postRaw(dest, postBodyExtras, opt);
+        return raw.get<APIResponse<T>>();
+    }
+
+    nlohmann::json getRaw(const std::string& dest,
                         const std::map<std::string, std::string>& extraParams = {},
                         const APIConfigOpt& opt = {});
+
+    template <typename T>
+    std::vector<T> get(const std::string& dest,
+                        const std::map<std::string, std::string>& extraParams = {},
+                        const APIConfigOpt& opt = {}) {
+        auto raw = getRaw(dest, extraParams, opt);
+        return raw.get<APIResponse<T>>();
+    }
 
     /**
      * Checks for a backoff, and sleeps if necessary.

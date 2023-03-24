@@ -1,6 +1,7 @@
 add_library(stackapi
     stackapi/StackAPI.cpp
 
+    stackapi/data/json/Deserialisers.cpp
 )
 
 target_include_directories(stackapi PUBLIC ./)
