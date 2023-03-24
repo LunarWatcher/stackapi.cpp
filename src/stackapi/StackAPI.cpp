@@ -133,7 +133,7 @@ nlohmann::json StackAPI::getRaw(const std::string &dest,
             return json;
         } break;
         default:
-            throw std::runtime_error("Unhandled status code: " + std::to_string(res.status_code));
+            throw std::runtime_error("Unhandled status code: " + std::to_string(res.status_code) + "; " + res.text + "; " + res.error.message);
         }
 
     } while (true);
