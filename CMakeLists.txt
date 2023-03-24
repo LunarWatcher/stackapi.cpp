@@ -3,26 +3,19 @@ project(stackapi.cpp)
 
 set (CMAKE_CXX_STANDARD 20)
 
-if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
-  message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
-  file(DOWNLOAD "https://raw.githubusercontent.com/conan-io/cmake-conan/0.18.1/conan.cmake"
-                "${CMAKE_BINARY_DIR}/conan.cmake"
-                TLS_VERIFY ON)
-endif()
+include(FetchContent)
+FetchContent_Declare(cpr GIT_REPOSITORY https://github.com/libcpr/cpr.git
+                         GIT_TAG 1.10.0)
+FetchContent_MakeAvailable(cpr)
 
-include(${CMAKE_BINARY_DIR}/conan.cmake)
+FetchContent_Declare(nlohmann GIT_REPOSITORY https://github.com/nlohmann/json
+    GIT_TAG v3.11.2)
+FetchContent_MakeAvailable(nlohmann)
 
-conan_cmake_configure (REQUIRES 
-                        cpr/1.10.1
-                        nlohmann_json/3.11.2
-                        fmt/9.1.0 
-                        spdlog/1.11.0 
-                        GENERATORS cmake)
-conan_cmake_autodetect (settings)
-conan_cmake_install (PATH_OR_REFERENCE . BUILD missing SETTINGS ${settings})
+FetchContent_Declare(spdlog GIT_REPOSITORY https://github.com/gabime/spdlog
+    GIT_TAG v1.11.0)
+FetchContent_MakeAvailable(spdlog)
 
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()
 
 add_subdirectory(src)
 #add_subdirectory(tests)

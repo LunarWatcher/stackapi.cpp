@@ -5,8 +5,7 @@ add_library(stackapi
 )
 
 target_include_directories(stackapi PUBLIC ./)
-target_include_directories(stackapi PUBLIC ${CONAN_INCLUDE_DIRS})
 
-target_link_libraries(stackapi PUBLIC ${CONAN_LIBS})
+target_link_libraries(stackapi PUBLIC cpr::cpr nlohmann_json::nlohmann_json spdlog::spdlog)
 
 # vim:ft=cmake
