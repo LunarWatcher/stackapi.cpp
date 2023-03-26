@@ -14,6 +14,7 @@ int main() {
             .apiKey{API_KEY},
             .site{"stackoverflow"},
             .pageSize = 2, // Not required, purely for demonstration purposes. pageSize is 100 by default.
+            .userAgent{"TODO"}, // Strongly encouraged, see https://stackapps.com/a/8965/69829 and https://meta.stackexchange.com/a/446
         }
     );
 

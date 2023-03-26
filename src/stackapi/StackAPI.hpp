@@ -4,9 +4,12 @@
 #include <string>
 #include <vector>
 
+#include "cpr/session.h"
+#include "cpr/user_agent.h"
 #include "data/Backoff.hpp"
 #include "nlohmann/json_fwd.hpp"
 #include "stackapi/data/structs/APIResponse.hpp"
+#include "stackapi/data/web/MTSession.hpp"
 #include <cpr/cpr.h>
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
@@ -24,6 +27,18 @@ struct APIConfig {
 
     bool autoHandleBackoff = true;
     bool autoHandleDowntime = true;
+    /**
+     * This is one of the more aggressive defaults, but there is a good reason for it:
+     * 1. 404s during development are easier to see; ctrl-c, fix, continue on your merry way.
+     * 2. 404s are often a symptom of downtime, as the server is on its last breath
+     *    and just able to spew out a 404, but isn't alive enough to tell it's committing die.
+     *
+     * If this is enabled, all 404s result in the normal downtime recovery system.
+     * If this is disabled, a single web request is made to api.stackexchange.com. If it's fine,
+     * the error recovery throws under the assumption it's a dev error. Otherwise, recovery
+     * commences.
+     */
+    bool treat404AsDowntime = true;
 
     /**
      * Backoff calculations have two seconds added for good measure.
@@ -35,6 +50,8 @@ struct APIConfig {
      * where thread safety (not currently implemented anyway) isn't enough.
      */
     int backoffStrictnessMultiplier = 1;
+
+    cpr::UserAgent userAgent = "StackAPIUnannouncedUser/git";
 
     Backoff backoff = { 0, std::chrono::system_clock::now() };
 };
@@ -49,11 +66,14 @@ struct APIConfigOpt {
 
     std::optional<bool> autoHandleBackoff;
     std::optional<bool> autoHandleDowntime;
+    std::optional<bool> treat404AsDowntime;
 };
 
 class StackAPI {
 public:
     APIConfig conf;
+    MTSession sess;
+
     /**
      * Utility control variable.
      *
@@ -100,6 +120,8 @@ public:
      * Also, the name is partly a lie. It also st ores the remaining quota in conf. 
      */
     void registerBackoff(const nlohmann::json& res);
+
+    std::optional<nlohmann::json> checkErrors(cpr::Response& res, const APIConfigOpt& opt);
 
     Backoff getBackoff() { return conf.backoff; }
     int getRemainingQuota() { return conf.remainingQuota; }

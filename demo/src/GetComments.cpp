@@ -9,6 +9,7 @@ int main() {
             .apiKey{API_KEY},
             .site{"stackoverflow"},
             .pageSize = 2,
+            .userAgent{"StackAPIDemo/git (+https://github.com/LunarWatcher/stackapi.cpp)"}
         }
     );
 

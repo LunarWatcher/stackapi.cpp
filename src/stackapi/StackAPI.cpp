@@ -8,6 +8,8 @@ StackAPI::StackAPI(const APIConfig& conf, bool dryRun) : conf(conf), dryRun(dryR
     if (conf.apiKey == "") {
         throw std::runtime_error("Misconfiguration: an API key is required.");
     }
+
+    sess.sess.SetUserAgent(conf.userAgent);
 }
 
 nlohmann::json StackAPI::postRaw(const std::string& dest,
@@ -39,51 +41,10 @@ nlohmann::json StackAPI::postRaw(const std::string& dest,
         }
 
         cpr::Url url{"https://api.stackexchange.com/" + conf.apiVersion + "/" + dest};
-        auto res = cpr::Post(url, body);
+        auto res = sess.Post(url, body, conf.userAgent);
 
-        auto status_code = res.status_code;
-        if (status_code == 400) { 
-            try {
-                status_code = nlohmann::json::parse(res.text).at("error_id");
-            } catch (...) {
-                // "json" is HTML
-                status_code = 500;
-            }
-        }
-
-        switch (status_code) {
-        case 0: {
-            if (opt.autoHandleDowntime.value_or(conf.autoHandleDowntime)) {
-                spdlog::warn("Host disconnected from the internet. Sleeping 5 minutes...");
-                std::this_thread::sleep_for(std::chrono::minutes(5));
-            } else {
-                throw std::runtime_error("Connection failed or internet dead (probably the latter): " + res.text + "; " + res.error.message);
-            }
-        } break;
-        case 500:
-        case 503: {
-            if (opt.autoHandleDowntime.value_or(conf.autoHandleDowntime)) {
-                spdlog::warn("Stack is down. Sleeping 5 minutes...");
-                std::this_thread::sleep_for(std::chrono::minutes(5));
-            } else {
-                throw std::runtime_error("Stack's servers are down: " + res.text + "; " + res.error.message);
-            }
-        } break;
-        case 502: {
-            if (opt.autoHandleBackoff.value_or(conf.autoHandleBackoff)) {
-                spdlog::warn("Backoff violated. Sleeping for 5 minutes...");
-                std::this_thread::sleep_for(std::chrono::minutes(5));
-            } else {
-                throw std::runtime_error("Backoff violated. " + res.text + "; " + res.error.message);
-            }
-        } break;
-        case 200: {
-            auto json = nlohmann::json::parse(res.text);
-            registerBackoff(json);
-            return json;
-        } break;
-        default:
-            throw std::runtime_error("Unhandled status code: " + std::to_string(res.status_code) + ": " + res.text + " ; " + res.error.message);
+        if (auto jsonOpt = checkErrors(res, opt)) {
+            return *jsonOpt;
         }
 
     } while (true);
@@ -117,53 +78,11 @@ nlohmann::json StackAPI::getRaw(const std::string &dest,
         }
 
         cpr::Url url{"https://api.stackexchange.com/" + conf.apiVersion + "/" + dest};
-        auto res = cpr::Get(url, body);
+        auto res = sess.Get(url, body, conf.userAgent);
 
-        auto status_code = res.status_code;
-        if (status_code == 400) { 
-            try {
-                status_code = nlohmann::json::parse(res.text).at("error_id");
-            } catch (...) {
-                // "json" is HTML
-                status_code = 500;
-            }
+        if (auto jsonOpt = checkErrors(res, opt)) {
+            return *jsonOpt;
         }
-
-        switch (status_code) {
-        case 0: {
-            if (opt.autoHandleDowntime.value_or(conf.autoHandleDowntime)) {
-                spdlog::warn("Host disconnected from the internet. Sleeping 5 minutes...");
-                std::this_thread::sleep_for(std::chrono::minutes(5));
-            } else {
-                throw std::runtime_error("Connection failed or internet dead (probably the latter): " + res.text + "; " + res.error.message);
-            }
-        } break;
-        case 500:
-        case 503: {
-            if (opt.autoHandleDowntime.value_or(conf.autoHandleDowntime)) {
-                spdlog::warn("Stack is down. Sleeping 5 minutes...");
-                std::this_thread::sleep_for(std::chrono::minutes(5));
-            } else {
-                throw std::runtime_error("Stack's servers are down: " + res.text + "; " + res.error.message);
-            }
-        } break;
-        case 502: {
-            if (opt.autoHandleBackoff.value_or(conf.autoHandleBackoff)) {
-                spdlog::warn("Backoff violated. Sleeping for 5 minutes...");
-                std::this_thread::sleep_for(std::chrono::minutes(5));
-            } else {
-                throw std::runtime_error("Backoff violated. " + res.text + "; " + res.error.message);
-            }
-        } break;
-        case 200: {
-            auto json = nlohmann::json::parse(res.text);
-            registerBackoff(json);
-            return json;
-        } break;
-        default:
-            throw std::runtime_error("Unhandled status code: " + std::to_string(res.status_code) + "; " + res.text + "; " + res.error.message);
-        }
-
     } while (true);
 
 }
@@ -186,6 +105,54 @@ void StackAPI::checkBackoff() {
 
         backoff.secs = 0;
     }
+}
+
+std::optional<nlohmann::json> StackAPI::checkErrors(cpr::Response& res, const APIConfigOpt& opt) {
+    auto status_code = res.status_code;
+    if (status_code == 400) { 
+        try {
+            status_code = nlohmann::json::parse(res.text).at("error_id");
+        } catch (...) {
+            // "json" is HTML
+            status_code = 500;
+        }
+    }
+
+    switch (status_code) {
+    case 0: {
+        if (opt.autoHandleDowntime.value_or(conf.autoHandleDowntime)) {
+            spdlog::warn("Host disconnected from the internet. Sleeping 5 minutes...");
+            std::this_thread::sleep_for(std::chrono::minutes(5));
+        } else {
+            throw std::runtime_error("Connection failed or internet dead (probably the latter): " + res.text + "; " + res.error.message);
+        }
+    } break;
+    case 500:
+    case 503: {
+        if (opt.autoHandleDowntime.value_or(conf.autoHandleDowntime)) {
+            spdlog::warn("Stack is down. Sleeping 5 minutes...");
+            std::this_thread::sleep_for(std::chrono::minutes(5));
+        } else {
+            throw std::runtime_error("Stack's servers are down: " + res.text + "; " + res.error.message);
+        }
+    } break;
+    case 502: {
+        if (opt.autoHandleBackoff.value_or(conf.autoHandleBackoff)) {
+            spdlog::warn("Backoff violated. Sleeping for 5 minutes...");
+            std::this_thread::sleep_for(std::chrono::minutes(5));
+        } else {
+            throw std::runtime_error("Backoff violated. " + res.text + "; " + res.error.message);
+        }
+    } break;
+    case 200: {
+        auto json = nlohmann::json::parse(res.text);
+        registerBackoff(json);
+        return json;
+    } break;
+    default:
+        throw std::runtime_error("Unhandled status code: " + std::to_string(res.status_code) + "; " + res.text + "; " + res.error.message);
+    }
+    return {};
 }
 
 void StackAPI::registerBackoff(const nlohmann::json &res) {
