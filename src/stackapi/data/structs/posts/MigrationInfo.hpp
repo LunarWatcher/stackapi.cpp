@@ -13,6 +13,6 @@ struct MigrationInfo {
     Site origin;
     API_INT question_id;
 };
-void from_json(const nlohmann::json &j, MigrationInfo &r);
+extern void from_json(const nlohmann::json &j, MigrationInfo &r);
 
 }
