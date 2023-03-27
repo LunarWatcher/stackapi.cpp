@@ -7,15 +7,20 @@ int main() {
     stackapi::StackAPI api (
         {
             .apiKey{API_KEY},
-            .site{"stackoverflow"},
-            .pageSize = 5,
-            .userAgent{"StackAPIDemo/git (+https://github.com/LunarWatcher/stackapi.cpp)"}
+                .site{"stackoverflow"},
+                .pageSize = 5,
+                .userAgent{"StackAPIDemo/git (+https://github.com/LunarWatcher/stackapi.cpp)"}
         }
     );
 
-    auto res = api.get<stackapi::Question>("questions", {}, {
-        .filter{"!nOedRLb*BA"},
-    });
+    auto res = api.get<stackapi::Question>(
+        "questions",
+        {
+            //{"sort", "votes"}
+        },
+        {
+            .filter{"!nOedRLb*BA"},
+        });
     std::cout << "Received " << res.items.size() << " questions." << std::endl;
     std::cout << "Samples: " << std::endl;
     for (auto& question : res.items) {

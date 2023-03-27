@@ -4,14 +4,16 @@ After installing and linking, using the library is fairly straight-forward:
 
 ```cpp
 #include "stackapi/StackAPI.hpp"
-#include "stackapi/data/structs/Comment.hpp"
+#include "stackapi/data/structs/comments/Comment.hpp"
 
 #include <iostream>
 
 int main() {
     stackapi::StackAPI api (
         {
-            .apiKey{API_KEY},
+            .apiKey{API_KEY}, // How you store your API key before the program launches
+                              // is entirely up to you. Hardcoding it is fine, it isn't
+                              // considered a secret. 
             .site{"stackoverflow"},
             .pageSize = 2, // Not required, purely for demonstration purposes. pageSize is 100 by default.
             .userAgent{"TODO"}, // Strongly encouraged, see https://stackapps.com/a/8965/69829 and https://meta.stackexchange.com/a/446
@@ -98,3 +100,32 @@ This is mostly a convenience to avoid complete crashes, and rather resume where 
 Backoff handling, including error handling when backoff has been violated, is automatically handled as well. Backoff is tracked when returned, and a sufficient amount of time is slept on the next API call. Two seconds more than Stack says to back off for is added by default, though this can be controlled via `backoffStrictnessMultiplier` in the config.
 
 Backoff handling can be disabled and manually invoked by either manually checking the backoff period, or by calling `api.checkBackoff()`. 
+
+## Passing additional data
+
+Many endpoints have additional data, and this is a pain to manage. For instance, if you'd like to sort questions by votes, this is sort of manual.
+
+The `GetQuestions` demo has an example for this; sorting by votes. Sorting isn't part of the `opt`s, so you're stuck passing these manually. `GetQuestions` already spoils how this is done, but it's commented out by default:
+
+```cpp
+auto res = api.get<stackapi::Question>(
+    "questions",
+    {
+        {"sort", "votes"}
+    },
+    {
+        .filter{"!nOedRLb*BA"},
+    });
+```
+
+Another related example is editing (**Note:** this requires auth, which is discussed later)
+```cpp
+api.postRaw(
+    "questions/1234/edit",
+    {
+        {"title", title},
+        {"tags", tags},
+        ...
+    } // Note: opts aren't passed in this case, so it uses the defaults from the global config if necessary
+);
+```
