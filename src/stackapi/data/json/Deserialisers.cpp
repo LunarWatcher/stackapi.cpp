@@ -3,6 +3,15 @@
 #include "stackapi/data/structs/NullStruct.hpp"
 #include "stackapi/data/structs/ShallowUser.hpp"
 #include "stackapi/data/structs/User.hpp"
+#include "stackapi/data/structs/collectives/Collective.hpp"
+#include "stackapi/data/structs/collectives/CollectiveExternalLink.hpp"
+#include "stackapi/data/structs/collectives/CollectiveMembership.hpp"
+#include "stackapi/data/structs/collectives/CollectiveRecommendation.hpp"
+#include "stackapi/data/structs/network/RelatedSite.hpp"
+#include "stackapi/data/structs/network/Site.hpp"
+#include "stackapi/data/structs/network/Styling.hpp"
+#include "stackapi/data/structs/posts/Answer.hpp"
+#include "stackapi/data/structs/posts/MigrationInfo.hpp"
 
 
 #define COND_AT(field, dest) if (j.contains(field)) { \
@@ -78,6 +87,109 @@ void from_json(const nlohmann::json& j, User& r) {
     COND_AT("user_type", r.user_type);
     COND_AT("view_count", r.view_count);
     COND_AT("website_url", r.website_url);
+}
+
+void from_json(const nlohmann::json& j, Collective& r) {
+    COND_AT("description", r.description);
+    COND_AT("collective_external_links", r.collective_external_links);
+    COND_AT("link", r.link);
+    COND_AT("name", r.name);
+    COND_AT("slug", r.slug);
+    COND_AT("tags", r.tags);
+}
+
+void from_json(const nlohmann::json &j, CollectiveExternalLink &r) {
+    COND_AT("link", r.link);
+    COND_AT("type", r.type);
+}
+
+void from_json(const nlohmann::json &j, CollectiveMembership &r) {
+    COND_AT("collective", r.collective);
+    COND_AT("role", r.role);
+}
+
+void from_json(const nlohmann::json &j, Styling &r) {
+    COND_AT("link_color", r.link_color);
+    COND_AT("tag_background_color", r.tag_background_color);
+    COND_AT("tag_foreground_color", r.tag_foreground_color);
+}
+
+void from_json(const nlohmann::json &j, Site &r) {
+    COND_AT("aliases", r.aliases);
+    COND_AT("api_site_parameter", r.api_site_parameter);
+    COND_AT("audience", r.audience);
+    COND_AT("closed_beta_date", r.closed_beta_date);
+    COND_AT("favicon_url", r.favicon_url);
+    COND_AT("high_resolution_icon_url", r.high_resolution_icon_url);
+    COND_AT("icon_url", r.icon_url);
+
+    COND_AT("launch_date", r.launch_date);
+    COND_AT("logo_url", r.logo_url);
+    COND_AT("markdown_extensions", r.markdown_extensions);
+    COND_AT("name", r.name);
+    COND_AT("open_beta_date", r.open_beta_date);
+    COND_AT("related_sites", r.related_sites);
+    COND_AT("site_state", r.site_state);
+    COND_AT("site_type", r.site_type);
+    COND_AT("site_url", r.site_url);
+    COND_AT("styling", r.styling);
+    COND_AT("twitterAccount", r.twitterAccount);
+}
+
+void from_json(const nlohmann::json &j, MigrationInfo &r) {
+    COND_AT("on_date", r.on_date);
+    COND_AT("origin", r.origin);
+    COND_AT("question_id", r.question_id);
+}
+
+void from_json(const nlohmann::json &j, CollectiveRecommendation &r) {
+    COND_AT("collective", r.collective);
+    COND_AT("creation_date", r.creation_date);
+}
+
+void from_json(const nlohmann::json &j, RelatedSite &r) {
+    COND_AT("api_site_parameter", r.api_site_parameter);
+    COND_AT("name", r.name);
+    COND_AT("relation", r.relation);
+    COND_AT("site_url", r.site_url);
+}
+
+void from_json(const nlohmann::json& j, Answer& r) {
+    COND_AT("accepted", r.accepted);
+    COND_AT("answer_id", r.answer_id);
+    COND_AT("awarded_bounty_amount", r.awarded_bounty_amount);
+    COND_AT("awarded_bounty_users", r.awarded_bounty_users);
+    COND_AT("body", r.body);
+    COND_AT("body_markdown", r.body_markdown);
+
+    COND_AT("can_comment", r.can_comment);
+    COND_AT("can_edit", r.can_edit);
+    COND_AT("can_flag", r.can_flag);
+    COND_AT("can_suggest_edit", r.can_suggest_edit);
+    COND_AT("collectives", r.collectives);
+    COND_AT("comment_count", r.comment_count);
+    COND_AT("comments", r.comments);
+    COND_AT("community_owned_date", r.community_owned_date);
+    COND_AT("content_license", r.content_license);
+    COND_AT("creation_date", r.creation_date);
+    COND_AT("down_vote_count", r.down_vote_count);
+    COND_AT("downvoted", r.downvoted);
+    COND_AT("is_accepted", r.is_accepted);
+
+    COND_AT("last_edit_date", r.last_edit_date);
+    COND_AT("lastEditor", r.lastEditor);
+    COND_AT("link", r.link);
+    COND_AT("locked_date", r.locked_date);
+    COND_AT("owner", r.owner);
+    COND_AT("posted_by_collectives", r.posted_by_collectives);
+    COND_AT("question_id", r.question_id);
+    COND_AT("collective_recommendations", r.collective_recommendations);
+    COND_AT("score", r.score);
+    COND_AT("share_link", r.share_link);
+    COND_AT("tags", r.tags);
+    COND_AT("title", r.title);
+    COND_AT("up_vote_count", r.up_vote_count);
+    COND_AT("upvoted", r.upvoted);
 }
 
 // Don't ask. Just pretend this doesn't exist.

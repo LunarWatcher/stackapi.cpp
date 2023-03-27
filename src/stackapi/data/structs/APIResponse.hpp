@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <nlohmann/json.hpp>
+#include "stackapi/data/structs/Types.hpp"
 
 #define COND_AT(field, dest) if (j.contains(field)) { \
         j.at(field).get_to(dest); \
@@ -14,19 +15,19 @@ template <typename T>
 struct APIResponse {
     bool has_more = false;
 
-    int backoff = 0;
-    int error_id = 0;
-    int page = 1;
-    int page_size = 0;
+    API_INT backoff = 0;
+    API_INT error_id = 0;
+    API_INT page = 1;
+    API_INT page_size = 0;
 
-    int quota_max = 0;
-    int quota_remaining = 0;
+    API_INT quota_max = 0;
+    API_INT quota_remaining = 0;
     
     std::string error_message = "";
     std::string error_name = "";
     std::string type = "";
 
-    int total = 0;
+    API_INT total = 0;
 
     std::vector<T> items {};
 };

@@ -3,6 +3,8 @@
 #include <nlohmann/json.hpp>
 #include <string>
 
+
+#include "stackapi/data/structs/Types.hpp"
 #include "ShallowUser.hpp"
 
 namespace stackapi {
@@ -11,16 +13,16 @@ struct Comment {
     std::string body;
     std::string body_markdown;
     bool can_flag;
-    int comment_id;
+    API_INT comment_id;
     std::string content_license;
-    long long creation_date;
+    API_DATE creation_date;
     bool edited;
     std::string link;
     ShallowUser owner;
-    int post_id;
+    API_INT post_id;
     std::string post_type;
     ShallowUser reply_to_user;
-    int score;
+    API_INT score;
     bool upvoted;
 };
 
