@@ -40,9 +40,9 @@ struct Question {
     API_DATE creation_date;
     API_INT delete_vote_count;
     API_INT down_vote_count;
-    bool downvoted ;
+    bool downvoted;
     API_INT favorite_count;
-    bool favorited ;
+    bool favorited;
     bool is_answered;
     API_DATE last_activity_date;
     API_DATE last_edit_date;
