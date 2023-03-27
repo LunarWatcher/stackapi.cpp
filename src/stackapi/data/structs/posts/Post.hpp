@@ -1,58 +1,43 @@
 #pragma once
 
-#include <nlohmann/json.hpp>
-#include <string>
-#include <vector>
-
 #include "stackapi/data/structs/comments/Comment.hpp"
 #include "stackapi/data/structs/users/ShallowUser.hpp"
 #include "stackapi/data/structs/collectives/Collective.hpp"
-#include "stackapi/data/structs/collectives/CollectiveRecommendation.hpp"
+#include <vector>
+#include <string>
 #include "stackapi/data/structs/Types.hpp"
 
 namespace stackapi {
 
-struct Answer {
-    bool accepted;
-    API_INT answer_id;
-    API_INT awarded_bounty_amount;
-    API_INT awarded_bounty_users;
+// Strictly speaking, this _could_ be merged into both Question and Answer to reduce some overhead, but... meh.
+// Doing so doesn't simplify the deserialisation anyway, and just adds another layer of overhead.
+// Also, post_id isn't the name used in both Question and Answer, so it really does nothing.
+//
+// Shit API design IMO, but I didn't make it. I'm just masochistic enough to make an adapter for it.
+// There's... a lot of questionable decisions.
+struct Post {
     std::string body;
     std::string body_markdown;
-
-    bool can_comment;
-    bool can_edit;
-    bool can_flag;
-    bool can_suggest_edit;
     std::vector<Collective> collectives;
     API_INT comment_count;
     std::vector<Comment> comments;
-    API_DATE community_owned_date;
     std::string content_license;
     API_DATE creation_date;
     API_INT down_vote_count;
     bool downvoted;
-    bool is_accepted;
-
+    API_DATE last_activity_date;
     API_DATE last_edit_date;
-    ShallowUser last_editor;
-    std::string link;
-    API_DATE locked_date;
     ShallowUser owner;
+    API_INT post_id;
+    std::string post_type;
     std::vector<Collective> posted_by_collectives;
-    API_INT question_id;
-    std::vector<CollectiveRecommendation> collective_recommendations;
     API_INT score;
     std::string share_link;
-    std::vector<std::string> tags;
     std::string title;
     API_INT up_vote_count;
     bool upvoted;
-    
-
 };
 
-extern void from_json(const nlohmann::json& j, Answer& r);
-
+extern void from_json(const nlohmann::json& j, Post& r);
 
 }

@@ -5,7 +5,7 @@
 
 
 #include "stackapi/data/structs/Types.hpp"
-#include "ShallowUser.hpp"
+#include "stackapi/data/structs/users/ShallowUser.hpp"
 
 namespace stackapi {
 

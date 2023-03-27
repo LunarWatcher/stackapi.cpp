@@ -1,5 +1,5 @@
 #include "stackapi/StackAPI.hpp"
-#include "stackapi/data/structs/Comment.hpp"
+#include "stackapi/data/structs/comments/Comment.hpp"
 
 #include <iostream>
 
