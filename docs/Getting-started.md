@@ -8,7 +8,7 @@ As already spoiled in the main README, you need a C++20 compiler and a fairly re
 
 Theoretically, all operating systems are supported. However, because Windows is Windows, and I use Linux, there is always a chance it's broken.
 
-If you can't get it to compile, open an issue. The primary goal is to support Linux, MacOS, and Windows. The main problem here is that I'm a Linux user, I don't own a Mac computer, and compiling on Windows is fucking miserable, so I'd rather not unless I have to.
+If you can't get it to compile, open an issue. The primary goal is to support Linux, MacOS, and Windows. The main problem here is that I'm a Linux user, I don't own a Mac, and compiling on Windows is fucking miserable, so I'd rather not unless I have to.
 
 PRs to fix any incompatibilities are welcome, though it's currently unlikely there's going to be problems. All dependencies are cross-platform, and none of the library code uses OS API stuff (to be clear, I mean calls directly performed by the library, so calls unavoidably made by libraries do not count), so it _should_ be fine. 
 
