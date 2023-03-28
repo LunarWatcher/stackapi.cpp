@@ -79,6 +79,12 @@ In the event that an API endpoint returns an unknown value (or that "practically
 
 This is also the only type of data structure not formally part of the API spec. It exists because static typing occasionally requires creative solutions. All other data objects line up with the Stack API, as defined in the documentation for v2.3 of the API.
 
+## A note on data object imports
+
+It's strongly recommended that individual objects are imported separately when needed. Note that some imports may be unnecessary if they're dependencies of other structs, but that's not really important. It's effectively import on demand due to being needed by a struct you've imported.
+
+If, however, you have a large amount of different data objects used, and don't want to import them all manually, you can `#include "stackapi/data/structs/ImportAll.hpp"`. This will, as the name suggests, import _all_ data structs currently defined by the library. This can potentially add compiler overhead, so it isn't recommended unless you plan to use a truly large amount of structs, and don't want to import them all separately. YMMV.
+
 ## Error handling
 
 The library has a large amount of built-in error handling. This is because Stack has a lot of stupid systems, such as using API-based return values that represent the error rather than HTTP status codes. This itself would be fine, except the API often has problems and returns HTTP code-based errors rather than error codes embedded in returned JSON. 
