@@ -37,6 +37,7 @@ You can use FetchContent as well:
 include (FetchContent)
 FetchContent_Declare(stackapi
     GIT_REPOSITORY https://github.com/LunarWatcher/stackapi.cpp)
+FetchContent_MakeAvailable(stackapi)
 ```
 
 Note that due to the lack of versioning, you'll have to figure out how you want to deal with the rest on your own. You can pin it to a commit, or you can leave it as-is. Proper tags may eventually be created as the library stabilises, but this is a while out.
@@ -48,4 +49,4 @@ target_link_libraries(your-program stackapi)
 
 ## After installing
 
-You should now have access to the library. See the [general use document](General-use.md) for getting started with the code.
+You should now have access to the library. See the [general use document](General-use.md) for getting started with the code, or take a look at the demos.
