@@ -150,7 +150,7 @@ std::optional<nlohmann::json> StackAPI::checkErrors(cpr::Response& res, const AP
         return json;
     } break;
     default:
-        throw std::runtime_error("Unhandled status code: " + std::to_string(res.status_code) + "; " + res.text + "; " + res.error.message);
+        throw std::runtime_error("Unhandled status code: " + std::to_string(res.status_code) + "; " + res.text + "; " + res.error.message + " on URL " + res.url.str());
     }
     return {};
 }
