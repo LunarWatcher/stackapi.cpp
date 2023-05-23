@@ -47,6 +47,10 @@ Linking is trivial:
 target_link_libraries(your-program stackapi)
 ```
 
+### Linux note
+
+Due to SSL being used, Linux users have to install libssl-dev (Debian and derivatives; see your package manager for the appropriate name). Windows and Apple users default to WinSSL and DarwinSSL respectively. This is a consequence of OpenSSL not being CMake-based, and I don't feel like spending time on finding a CMake wrapper for the near foreseeable future.
+
 ## After installing
 
 You should now have access to the library. See the [general use document](General-use.md) for getting started with the code, or take a look at the demos.
