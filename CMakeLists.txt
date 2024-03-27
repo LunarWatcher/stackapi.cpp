@@ -17,7 +17,7 @@ set(CURL_ZLIB ON CACHE STRING "" FORCE)
 
 include(FetchContent)
 FetchContent_Declare(fmt GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-    GIT_TAG 9.1.0)
+    GIT_TAG 10.2.1)
 FetchContent_MakeAvailable(fmt)
 
 include(FetchContent)
@@ -30,7 +30,7 @@ FetchContent_Declare(nlohmann GIT_REPOSITORY https://github.com/nlohmann/json
 FetchContent_MakeAvailable(nlohmann)
 
 FetchContent_Declare(spdlog GIT_REPOSITORY https://github.com/gabime/spdlog
-    GIT_TAG v1.11.0)
+    GIT_TAG v1.13.0)
 FetchContent_MakeAvailable(spdlog)
 
 
