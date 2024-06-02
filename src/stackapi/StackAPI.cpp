@@ -127,6 +127,14 @@ std::optional<nlohmann::json> StackAPI::checkErrors(cpr::Response& res, const AP
             throw std::runtime_error("Connection failed or internet dead (probably the latter): " + res.text + "; " + res.error.message);
         }
     } break;
+    case 429:
+        // Cloudflare bullshit
+        if (opt.autoHandleBackoff.value_or(conf.autoHandleBackoff)) {
+            spdlog::warn("Cloudflare says no. Sleeping for 5 minutes...");
+            std::this_thread::sleep_for(std::chrono::minutes(5));
+        } else {
+            throw std::runtime_error("Cloudflare backoff");
+        }
     case 500:
     case 503: {
         if (opt.autoHandleDowntime.value_or(conf.autoHandleDowntime)) {
