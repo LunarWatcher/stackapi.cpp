@@ -16,6 +16,18 @@
 
 namespace stackapi {
 
+enum class FaultType {
+    DOWNTIME,
+    CLOUDFLARE,
+    RATE_LIMIT,
+    OTHER,
+    /**
+     * Special code that doesn't denote a fault, but notes that whatever fault was previously reported has been fixed.
+     * Note that if FaultType == RESTORED, then message == "", so it shouldn't be displayed directly.
+     */
+    RESTORED
+};
+
 struct APIConfig {
     std::string apiKey = "";
     std::string auth = "";
@@ -53,7 +65,43 @@ struct APIConfig {
 
     cpr::UserAgent userAgent = "StackAPIUnannouncedUser/git";
 
+    /**
+     * Special callback invoked when dealing with backoff or downtime. 
+     * Note that this is only invoked when autoHandleBackoff and/or autoHandleDowntime is true.
+     * If, for example, automatically handling backoff, but autoHandleBackoff is false, an
+     * exception is thrown instead. This callback is meant to be coupled with the built-in
+     * handling systems.
+     *
+     * Note that FaultType doesn't 1:1 correspond with the different config options. Notably,
+     * Cloudflare is treated as backoff, while RATE_LIMIT just refers to the standard backoff.
+     * The categories are meant to be used to separate issues you do or don't care about handling.
+     *
+     * This function is primarily aimed at two things:
+     * 1. Supplying fault notification systems with information; for the most part, this applies to
+     *    CLOUDFLARE, as cloudflare blocking is downtime, while rate limit-based backoff is more expected.
+     *
+     *    This is primarily aimed at bot and bot management, and to make it easier for me to know when to
+     *    poke SE with another complaint about Cloudflare being dumb again
+     * 2. Supplying information to an end-user in, for example, a desktop application, where the auto-handling
+     *    is still desirable behaviour, but where the user also should be notified
+     *
+     * Note that this function is not required. If you don't care about handling any of these, set the value to
+     * nullptr. 
+     *
+     * Also note that not everything reported is an error. This function is also invoked when doing preventative
+     * backoff waiting, and not only when SE blocks the request. This is also reported under FaultType::RATE_LIMIT,
+     * with a message explaining the problem. I have not decided if it makes sense to separate these or not.
+     */
+    std::function<void(FaultType, const std::string& message)> errorCallback = nullptr;
+
     Backoff backoff = { 0, std::chrono::system_clock::now() };
+
+    void reportError(FaultType type, const std::string& message) const {
+        if (errorCallback) {
+            errorCallback(type, message);
+        }
+    }
+
 };
 
 struct APIConfigOpt {
@@ -67,6 +115,7 @@ struct APIConfigOpt {
     std::optional<bool> autoHandleBackoff;
     std::optional<bool> autoHandleDowntime;
     std::optional<bool> treat404AsDowntime;
+
 };
 
 class StackAPI {
