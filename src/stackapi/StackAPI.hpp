@@ -33,7 +33,9 @@ struct APIConfig {
     std::string auth = "";
     std::string site = "";
 
-    std::string apiVersion = "2.3";
+    int client_id;
+
+    std::string apiVersion = "3";
     unsigned int pageSize = 100;
     int remainingQuota = 0;
 

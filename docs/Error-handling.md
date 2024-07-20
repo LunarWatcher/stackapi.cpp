@@ -26,6 +26,8 @@ This callback is invoked for several reasons:
 
 ## Manual error handling
 
+**WARNING:** Partly out-of-date section; status codes have changed. 
+
 If automatic error handling is either disabled or unavailable for a given type of error, you'll get exceptions. For the most part, you'll get an `stackapi::APIException`[^1], which contains a few fields that can be used for manual error handling:
 * message: A custom message supplied by stackchat
 * errorMessage: the full response from the API endpoint. May or may not be JSON, may or may not say something useful
@@ -35,6 +37,8 @@ If automatic error handling is either disabled or unavailable for a given type o
 See the [/errors](https://api.stackexchange.com/docs/errors) endpoint for documentation on values for `error_id`. Note that if you're using automatic error handling, 500, 502, and 503 are automatically handled, and don't require any custom logic. 
 
 The use of exceptions does require the use of try-catches in the code, but it also (in my biased opinion) simplifies certain parts of the handling. For example, if you're using an endpoint that requires an access_token, and you want to handle access token errors, you can use:
+
+
 ```cpp
 try {
     // Note that the NullStruct used here is purely because I don't care enough to look up the return value of this endpoint

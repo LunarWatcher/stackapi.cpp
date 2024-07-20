@@ -8,7 +8,7 @@ You need to figure out a way to get and store the auth key. The docs for getting
 
 ```cpp
 const std::string OAUTH_VERIFICATION_URL = "https://stackoverflow.com";
-const std::string OAUTH_URL = "https://stackoverflow.com/oauth/dialog?client_id=" + CLIENT_ID
+const std::string OAUTH_URL = "https://stackoverflow.com/oauth?client_id=" + CLIENT_ID
     + "&scope=write_access,no_expiry&redirect_uri=" + OAUTH_VERIFICATION_URL;
 ```
 ```cpp
@@ -31,15 +31,17 @@ int main() {
 }
 ```
 
-This will redirect the user to stackoverflow.com, where the token is then part of the URL. You _can_ use your own domain here, which makes more sense for web-based applications, but statistically, you're probably not when you're using C++. :)
+This will redirect the user to stackoverflow.com, where the token is then part of the URL as the `code` parameter. You _can_ use your own domain here, which makes more sense for web-based applications, but statistically, you're probably not when you're using C++. :)
 
-Note that to use this URL, the OAuth domain has to be `stackoverflow.com`. Doing so, from what I've gathered, is fairly standard among open-source tools.
+Note that to use this URL, the OAuth domain has to be `stackoverflow.com`. Doing so, from what I've gathered, is fairly standard among open-source non-webapps.
 
 The code is based on the implicit OAuth flow, because it's convenient. Additionally, step 4 of the explicit OAuth request requires the client_secret, which should never, ever be posted in public, and it's very easy to fuck that up with a public application, and it isn't possible to deploy at a scale, shy of requiring everyone to register their own, separate application. It just doesn't scale.
 
 ## Using the token
 
-As long as a token is passed, it's always supplied. The major advantage with this is not using the global IP-based quota, but using [one of your 5x10k user quotas](https://api.stackexchange.com/docs/throttle). Additionally, from my own observations, this doesn't result in nearly as many throttles when multiple apps are running, even if they're using different API keys.
+
+
+As long as a token is passed, it's always supplied. **OUTDATED; KEPT FOR LATER UPDATES:** The major advantage with this is not using the global IP-based quota, but using [one of your 5x10k user quotas](https://api.stackexchange.com/docs/throttle). Additionally, from my own observations, this doesn't result in nearly as many throttles when multiple apps are running, even if they're using different API keys.
 
 The inner workings of the rate limiting algorithm are a tightly kept secret though, so it might just be a coincidence.
 
@@ -63,8 +65,7 @@ auto res = api.get<stackapi::Answer>("answers", {}, {
     .filter{"!*MjkmyT9x3lPk8ML"},
 });
 ```
-
-The primary advantage with this strategy is that, by using it on auth-only endpoints, you can potentially double your quota. This is only efficient if there's nothing else running on the same IP though, because of the previously mentioned observed rate limit increase.
+Though there's often no reason to do so.
 
 Which you use is consequently not that important, as long as your program works optimally by whatever metrics you may have.
 
