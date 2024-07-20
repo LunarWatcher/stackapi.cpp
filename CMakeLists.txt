@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.20)
 project(stackapi.cpp)
 
 if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
